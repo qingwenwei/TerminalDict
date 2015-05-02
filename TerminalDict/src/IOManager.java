@@ -16,9 +16,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-
-
-
 public class IOManager {
 	private String KEY = "844913748";
 	private String KEY_FROM = "Weiqingwen";
@@ -65,26 +62,26 @@ public class IOManager {
 				
 				switch(keyValue){
 					case("us-phonetic"):
-						value = entry.getValue().toString();
+						value = entry.getValue().toString().replaceAll("\"", "");
 						e = new AbstractMap.SimpleEntry<String, String>("us-phonetic",value);
 						wordInfo.get("phon").add(e);
 						break;
 					
 					case("phonetic"):
-						value = entry.getValue().toString();
+						value = entry.getValue().toString().replaceAll("\"", "");
 						e = new AbstractMap.SimpleEntry<String, String>("phonetic",value);
 						wordInfo.get("phon").add(e);
 						break;
 					
 					case("uk-phonetic"):
-						value = entry.getValue().toString();
+						value = entry.getValue().toString().replaceAll("\"", "");
 						e = new AbstractMap.SimpleEntry<String, String>("uk-phonetic",value);
 						wordInfo.get("phon").add(e);
 						break;
 					
 					case("explains"):
 						for(JsonElement element:entry.getValue().getAsJsonArray()){
-							value = element.toString();
+							value = element.toString().replaceAll("\"", "");
 							e = new AbstractMap.SimpleEntry<String, String>("explain",value);
 							wordInfo.get("expl").add(e);
 						}
@@ -95,11 +92,11 @@ public class IOManager {
 			//extract the "web" JsonArray
 			JsonArray webArray = rootObject.get("web").getAsJsonArray();
 			for(JsonElement element:webArray){
-				String key = element.getAsJsonObject().get("key").toString();
+				String key = element.getAsJsonObject().get("key").toString().replaceAll("\"", "");
 				JsonArray valueArray = element.getAsJsonObject().get("value").getAsJsonArray();
 				
 				for(JsonElement v:valueArray){
-					value = v.toString();
+					value = v.toString().replaceAll("\"", "");
 					e = new AbstractMap.SimpleEntry<String, String>(key,value);
 					wordInfo.get("relv").add(e);
 				}
