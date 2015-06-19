@@ -1,1 +1,1 @@
-readme
+This is an terminal based English-Chinese dictionary written in Java
