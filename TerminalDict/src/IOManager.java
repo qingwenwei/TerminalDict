@@ -4,9 +4,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -29,12 +26,10 @@ public class IOManager {
 		return instance;
 	}
 	
-	public HashMap<String,ArrayList<Entry<String,String>>> getURLJsonData(String word){
-		//the HashMap to be returned
-		HashMap<String,ArrayList<Entry<String,String>>> wordInfo = new HashMap<String,ArrayList<Entry<String,String>>>();
-		wordInfo.put("phon", new ArrayList<Entry<String,String>>());
-		wordInfo.put("expl", new ArrayList<Entry<String,String>>());
-		wordInfo.put("relv", new ArrayList<Entry<String,String>>());
+	public Word getWordData(String word){
+		//word to be returned
+		Word newWord = new Word();
+		newWord.setWord(word);
 		
 		//construct the URL
 		String callURL = String.format(URL,KEY_FROM,KEY,word);
@@ -50,55 +45,47 @@ public class IOManager {
 			JsonElement root = parser.parse(new InputStreamReader((InputStream) request.getContent())); 
 			JsonObject rootObject = root.getAsJsonObject(); 
 			
+			//extract the "translation" JSON object
+			newWord.setTranslation(rootObject.get("translation").getAsString());
+			
+			//extract the "errorCode" JSON object
+			newWord.setErrorCode(rootObject.get("errorCode").getAsString());
+			
 			//extract the "basic" JsonObject
 			Set<Entry<String,JsonElement>> basicObjectSet = rootObject.get("basic").getAsJsonObject().entrySet();
 			Iterator<Entry<String,JsonElement>> basicObjectItr = basicObjectSet.iterator();
 			
-			String value = null;
-			Entry<String,String> e = null;
 			while (basicObjectItr.hasNext()){
 				Entry<String,JsonElement> entry = basicObjectItr.next();
 				String keyValue = entry.getKey();
 				
-				switch(keyValue){
-					case("us-phonetic"):
-						value = entry.getValue().toString().replaceAll("\"", "");
-						e = new AbstractMap.SimpleEntry<String, String>("us-phonetic",value);
-						wordInfo.get("phon").add(e);
-						break;
+				if(keyValue.equals("explains")){
+					for(JsonElement element:entry.getValue().getAsJsonArray()){
+						Pair explaination = new Pair();
+						explaination.setName(keyValue);
+						explaination.setValue(element.getAsString().replaceAll("\"", ""));
+						newWord.addExplaination(explaination);
+					}
 					
-					case("phonetic"):
-						value = entry.getValue().toString().replaceAll("\"", "");
-						e = new AbstractMap.SimpleEntry<String, String>("phonetic",value);
-						wordInfo.get("phon").add(e);
-						break;
-					
-					case("uk-phonetic"):
-						value = entry.getValue().toString().replaceAll("\"", "");
-						e = new AbstractMap.SimpleEntry<String, String>("uk-phonetic",value);
-						wordInfo.get("phon").add(e);
-						break;
-					
-					case("explains"):
-						for(JsonElement element:entry.getValue().getAsJsonArray()){
-							value = element.toString().replaceAll("\"", "");
-							e = new AbstractMap.SimpleEntry<String, String>("explain",value);
-							wordInfo.get("expl").add(e);
-						}
-						break;
+				}else{ // phonetics
+					Pair phonetics = new Pair();
+					phonetics.setName(keyValue);
+					phonetics.setValue(entry.getValue().getAsString().replaceAll("\"", ""));
+					newWord.addPhonetics(phonetics);
 				}
 			}
 			
 			//extract the "web" JsonArray
 			JsonArray webArray = rootObject.get("web").getAsJsonArray();
 			for(JsonElement element:webArray){
-				String key = element.getAsJsonObject().get("key").toString().replaceAll("\"", "");
+				String key = element.getAsJsonObject().get("key").getAsString().replaceAll("\"", "");
 				JsonArray valueArray = element.getAsJsonObject().get("value").getAsJsonArray();
 				
-				for(JsonElement v:valueArray){
-					value = v.toString().replaceAll("\"", "");
-					e = new AbstractMap.SimpleEntry<String, String>(key,value);
-					wordInfo.get("relv").add(e);
+				for(JsonElement v : valueArray){
+					Pair paraphrase = new Pair();
+					paraphrase.setName(key);
+					paraphrase.setValue(v.getAsString().replaceAll("\"", ""));
+					newWord.addWebParaphrase(paraphrase);
 				}
 			}
 			
@@ -108,18 +95,12 @@ public class IOManager {
 			e.printStackTrace();
 		}
 		
-		return wordInfo;
+		return newWord;
 	}
 	
 	
 	public static void main(String args[]){
-		HashMap<String, ArrayList<Entry<String, String>>> wordInfo = IOManager.getInstance().getURLJsonData("china");
-		
-		for(Entry<String, String> e:wordInfo.get("relv")){
-			System.out.println(e);
-		}
-		
-		
-
+		Word word = IOManager.getInstance().getWordData("cool");
+		System.out.println(word);
 	}
 }
