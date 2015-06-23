@@ -51,6 +51,16 @@ public class Word {
 		this.errorCode = errorCode;
 	}
 	
+	public void prompt(){
+		
+	}
+	
+	public String toXMLElement(){
+		String xml = "";
+		
+		return xml;
+	}
+	
 	public String toString(){
 		String toStr = "";
 		
@@ -69,4 +79,5 @@ public class Word {
 		
 		return toStr;
 	}
+	
 }
