@@ -21,6 +21,9 @@ public class XMLManager {
 	}
 	
 	public static void main(String args[]) throws IOException{
-		new XMLManager().foo();
+//		new XMLManager().foo();
+		
+		
+		
 	}
 }
