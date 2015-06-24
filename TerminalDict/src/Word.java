@@ -90,8 +90,7 @@ public class Word {
 	}
 	
 	public String toXMLElement(boolean web){
-		String xml = "";
-		xml+="<item>\n";
+		String xml = "\n<item>\n";
 		xml+="<word>" + word + "</word>\n";
 		for(Pair pair : phonetics)
 				xml+="<" + pair.getName() + ">" + pair.getValue() + "</" + pair.getName() + ">\n";
@@ -115,7 +114,7 @@ public class Word {
 		}
 		
 		for(String key : phraseMap.keySet()){
-			xml+= "<phrase>" + key + ": " + phraseMap.get(key) + "</phrase>\n";
+			xml+= "<phrase>" + key + "=" + phraseMap.get(key) + "</phrase>\n";
 		}
 			
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");

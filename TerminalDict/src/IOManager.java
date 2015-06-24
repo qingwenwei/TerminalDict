@@ -99,7 +99,7 @@ public class IOManager {
 	}
 	
 	
-	public static void main(String args[]){
+	public static void main(String args[]) throws IOException{
 		Word word = IOManager.getInstance().getWordData("cool");
 //		System.out.println(word.toXMLElement(true));
 		word.print();
