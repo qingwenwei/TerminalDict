@@ -102,6 +102,9 @@ public class IOManager {
 	public static void main(String args[]) throws IOException{
 		Word word = IOManager.getInstance().getWordData("cool");
 //		System.out.println(word.toXMLElement(true));
-		word.print();
+//		word.print();
+		
+		WordbookManager wb = new WordbookManager();
+		wb.insert(11, word.toXMLElement(false));
 	}
 }
