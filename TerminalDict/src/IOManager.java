@@ -26,7 +26,7 @@ public class IOManager {
 		return instance;
 	}
 	
-	public Word getWordData(String word){
+	public Word getWordData(String word, boolean web){
 		//word to be returned
 		Word newWord = new Word();
 		newWord.setWord(word);
@@ -75,6 +75,10 @@ public class IOManager {
 				}
 			}
 			
+			//return the new word if the web phrases were not requested
+			if(web==false)
+				return newWord;
+			
 			//extract the "web" JsonArray
 			JsonArray webArray = rootObject.get("web").getAsJsonArray();
 			for(JsonElement element:webArray){
@@ -100,11 +104,13 @@ public class IOManager {
 	
 	
 	public static void main(String args[]) throws IOException{
-		Word word = IOManager.getInstance().getWordData("cool");
-//		System.out.println(word.toXMLElement(true));
-//		word.print();
+		Word word = IOManager.getInstance().getWordData("loft", false);
+//		System.out.println(word.toXMLElement());
+		word.print();
 		
 		WordbookManager wb = new WordbookManager();
-		wb.insert(11, word.toXMLElement(false));
+		System.out.println(wb.hasWord(word.getWord()));
+		wb.addWord(11, word);
+		System.out.println(wb.hasWord(word.getWord()));
 	}
 }

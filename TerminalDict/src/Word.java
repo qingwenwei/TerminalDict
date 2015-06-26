@@ -89,7 +89,7 @@ public class Word {
 		}
 	}
 	
-	public String toXMLElement(boolean web){
+	public String toXMLElement(){
 		String xml = "\n<item>\n";
 		xml+="<word>" + word + "</word>\n";
 		for(Pair pair : phonetics)
@@ -100,7 +100,7 @@ public class Word {
 		
 		//extract web paraphrases
 		HashMap<String, String> phraseMap = new HashMap<String,String>();
-		if(web==true){
+		if(webParaphrase.size()!=0){
 			for(Pair pair : webParaphrase){
 				String key = pair.getName();
 				String value = pair.getValue();
@@ -114,7 +114,7 @@ public class Word {
 		}
 		
 		for(String key : phraseMap.keySet()){
-			xml+= "<phrase>" + key + "=" + phraseMap.get(key) + "</phrase>\n";
+			xml+= "<phrase>" + key + ": " + phraseMap.get(key) + "</phrase>\n";
 		}
 			
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");

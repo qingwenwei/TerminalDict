@@ -9,15 +9,23 @@ import java.nio.channels.FileChannel;
 
 
 public class WordbookManager {
+	private String config = "config.txt";
 	private String wordbook = "wordbook.xml";
-	private String wordList = "wordList.txt";
+	private String wordList = "wordlist.txt";
 	private String rootLocation = "/Users/qingwenwei/experimental_area/";
 	
 	public void readConfigFile(){
 		
 	}
 	
-	public void insert(long offset, String content) throws IOException {
+	public void addWord(long offset, Word word) throws IOException {
+		//check if this word exists
+		if(hasWord(word.getWord())){
+			System.out.println("The word <" + word.getWord() + "> already exists in the wordbook.");
+			return;
+		}
+		
+		String content = word.toXMLElement();
 		File file = new File(rootLocation + wordbook);
 		File fileTemp = new File(rootLocation + wordbook + "~");
 		RandomAccessFile r = new RandomAccessFile(file, "rw");
@@ -35,6 +43,9 @@ public class WordbookManager {
 		sourceChannel.close();
 		targetChannel.close();
 		
+		//refresh the word list
+		createWordList();
+		
 		//delete the temp file
 	}
 	
@@ -43,7 +54,7 @@ public class WordbookManager {
 			String currentLine;	 
 			BufferedReader br = new BufferedReader(new FileReader(rootLocation + wordList));	
 			while ((currentLine = br.readLine()) != null) {	
-				if(currentLine.contains(word) && currentLine.contains("<word>")){
+				if(currentLine.contains(word)){
 					return true;
 				}
 			}
@@ -55,7 +66,7 @@ public class WordbookManager {
 		return false;
 	}
 	
-	public void createWordList(){
+	private void createWordList(){
 		try {
 			File file = new File(rootLocation + wordList);
 			if (!file.exists()) {
@@ -86,15 +97,11 @@ public class WordbookManager {
 		 * insert text test
 		 */
 		WordbookManager wb = new WordbookManager();
-//		wb.insert(11, "<item>你好</item>\n");
-		
 		
 		/*
 		 * check if an item exists
 		 */
 //		wb.createWordList();
-		
-		
-		System.out.println(wb.hasWord("yoyo"));
+		System.out.println(wb.hasWord("loft"));
 	}
 }
