@@ -1,18 +1,14 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
-import java.util.Properties;
 
 
 public class WordbookManager {
-	private String config = "config.properties";
 	private String wordbook = "wordbook.xml";
 	private String wordList = "wordlist.txt";
 	private String rootLocation = "";
@@ -22,46 +18,16 @@ public class WordbookManager {
 		rootLocation = getRootDir();
 	}
 	
-	public void readConfig(){
-		Properties prop = new Properties();
-		InputStream input = null;
-	 
-		try {
-	 
-			input = new FileInputStream("config.properties");
-	 
-			// load a properties file
-			prop.load(input);
-	 
-			// get the property value and print it out
-			System.out.println(prop.getProperty("database"));
-			System.out.println(prop.getProperty("dbuser"));
-			System.out.println(prop.getProperty("dbpassword"));
-	 
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		} finally {
-			if (input != null) {
-				try {
-					input.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
+	public String rootDir(){
+		return rootLocation;
 	}
-	
-
 	
 	public String getRootDir(){
 		File currentJavaJarFile = new File(WordbookManager.class.getProtectionDomain().getCodeSource().getLocation().getPath());   
 		String currentJavaJarFilePath = currentJavaJarFile.getAbsolutePath();
 		String currentRootDirectoryPath = currentJavaJarFilePath.replace(currentJavaJarFile.getName(), "");
-		System.out.println("root dir: "+currentRootDirectoryPath);
 		return currentRootDirectoryPath;
 	}
-	
-	
 	
 	public void addWord(Word word) throws IOException {
 		//refresh the word list
@@ -111,6 +77,23 @@ public class WordbookManager {
 		}
 		
 		return false;
+	}
+	
+	public void numOfWord(){
+		int wordCounter = 0;
+		try {
+			String currentLine;	 
+			BufferedReader br = new BufferedReader(new FileReader(rootLocation + wordbook));	
+			while ((currentLine = br.readLine()) != null) {	
+				if(currentLine.contains("</word>")){
+					wordCounter++;
+				}
+			}
+			
+		} catch(IOException e){
+			e.printStackTrace();
+		}
+		System.out.println("There are [" + wordCounter + "] words in the wordbook.");
 	}
 	
 	private void syncWordList(){

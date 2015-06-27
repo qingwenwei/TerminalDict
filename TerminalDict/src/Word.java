@@ -70,9 +70,13 @@ public class Word {
 			System.out.println(pair.getValue());
 		}
 		
+		if(explainations.size()==0){
+			System.out.println("trans:"+translation);
+		}
+		
 		HashMap<String, String> phraseMap = new HashMap<String,String>();
 		if(webParaphrase.size()!=0){
-			System.out.println("\n-==Related Phrases From Web==-");
+			System.out.println("\n==============[Web]===============");
 			for(Pair pair : webParaphrase){
 				String key = pair.getName();
 				String value = pair.getValue();
@@ -97,6 +101,10 @@ public class Word {
 		
 		for(Pair pair : explainations)
 			xml+="<translation>" + pair.getValue() + "</translation>\n";
+		
+		if(explainations.size()==0){
+			xml+="<translation>" + translation + "</translation>\n";
+		}
 		
 		//extract web paraphrases
 		HashMap<String, String> phraseMap = new HashMap<String,String>();
@@ -124,23 +132,23 @@ public class Word {
 		return xml;
 	}
 	
-	public String toString(){
-		String toStr = "";
-		
-		toStr += "word: " + word + "\n";
-		toStr += "tran: " + translation + "\n";
-		toStr += "errc: " + errorCode + "\n";
-		
-		for(Pair pair : phonetics)
-			toStr += "phon: " + pair.getName() + "=" + pair.getValue() + "\n";
-		
-		for(Pair pair : explainations)
-			toStr += "expl: " + pair.getName() + "=" + pair.getValue() + "\n";
-		
-		for(Pair pair : webParaphrase)
-			toStr += "webp: " + pair.getName() + "=" + pair.getValue() + "\n";
-		
-		return toStr;
-	}
+//	public String toString(){
+//		String toStr = "";
+//		
+//		toStr += "word: " + word + "\n";
+//		toStr += "tran: " + translation + "\n";
+//		toStr += "errc: " + errorCode + "\n";
+//		
+//		for(Pair pair : phonetics)
+//			toStr += "phon: " + pair.getName() + "=" + pair.getValue() + "\n";
+//		
+//		for(Pair pair : explainations)
+//			toStr += "expl: " + pair.getName() + "=" + pair.getValue() + "\n";
+//		
+//		for(Pair pair : webParaphrase)
+//			toStr += "webp: " + pair.getName() + "=" + pair.getValue() + "\n";
+//		
+//		return toStr;
+//	}
 	
 }

@@ -3,6 +3,8 @@ import java.util.Scanner;
 
 
 public class Dictionary {
+	private static Scanner input;
+
 	public static void main(String args[]){
 		Word word = null;
 		
@@ -29,8 +31,11 @@ public class Dictionary {
 		
 		word.print();
 		
+		/*
+		 * prompt
+		 */
 		System.out.println("\nDo you want to save this word to wordbook? [Y/N]");
-		Scanner input = new Scanner(System.in);  
+		input = new Scanner(System.in);  
         String choice = input.next();
         
         if(choice.equalsIgnoreCase("y")){
@@ -44,31 +49,31 @@ public class Dictionary {
         }
 	}
 	
-	
-	public static String buildQuery(String args[], int end){
+	private static String buildQuery(String args[], int end){
 		String query = "";
 		for(int i=0; i<end; i++){
 			query+=args[i]+" ";
 		}
 		query = query.substring(0, query.length()-1);
 		query = query.replaceAll(" ", "%20");
-		System.out.println("built:"+query);
 		return query;
 	}
 	
-	
-	
-	public static boolean handleCommand(String cmd){
+	private static boolean handleCommand(String cmd){
 		switch (cmd){
 			case "-which": 
 				System.out.println(new WordbookManager().getRootDir());
 				return true;
-		
+				
+			case "-howmany": 
+				new WordbookManager().numOfWord();
+				return true;
+				
+			case "-about": 
+				System.out.println("Qingwen Wei (2015)");
+				return true;
 		}
-		
 		return false;
 	}
-	
-	
 	
 }
