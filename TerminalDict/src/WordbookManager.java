@@ -1,27 +1,75 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
+import java.util.Properties;
 
 
 public class WordbookManager {
-	private String config = "config.txt";
+	private String config = "config.properties";
 	private String wordbook = "wordbook.xml";
 	private String wordList = "wordlist.txt";
-	private String rootLocation = "/Users/qingwenwei/experimental_area/";
+	private String rootLocation = "";
+	private long insertOffset = 11;	
 	
-	public void readConfigFile(){
-		
+	public WordbookManager(){
+		rootLocation = getRootDir();
 	}
 	
-	public void addWord(long offset, Word word) throws IOException {
+	public void readConfig(){
+		Properties prop = new Properties();
+		InputStream input = null;
+	 
+		try {
+	 
+			input = new FileInputStream("config.properties");
+	 
+			// load a properties file
+			prop.load(input);
+	 
+			// get the property value and print it out
+			System.out.println(prop.getProperty("database"));
+			System.out.println(prop.getProperty("dbuser"));
+			System.out.println(prop.getProperty("dbpassword"));
+	 
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		} finally {
+			if (input != null) {
+				try {
+					input.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
+
+	
+	public String getRootDir(){
+		File currentJavaJarFile = new File(WordbookManager.class.getProtectionDomain().getCodeSource().getLocation().getPath());   
+		String currentJavaJarFilePath = currentJavaJarFile.getAbsolutePath();
+		String currentRootDirectoryPath = currentJavaJarFilePath.replace(currentJavaJarFile.getName(), "");
+		System.out.println("root dir: "+currentRootDirectoryPath);
+		return currentRootDirectoryPath;
+	}
+	
+	
+	
+	public void addWord(Word word) throws IOException {
+		//refresh the word list
+		syncWordList();
+				
 		//check if this word exists
 		if(hasWord(word.getWord())){
-			System.out.println("The word <" + word.getWord() + "> already exists in the wordbook.");
+			System.out.println("[Exists] The word <" + word.getWord() + "> already exists in the wordbook.");
 			return;
 		}
 		
@@ -33,20 +81,19 @@ public class WordbookManager {
 		long fileSize = r.length();
 		FileChannel sourceChannel = r.getChannel();
 		FileChannel targetChannel = rtemp.getChannel();
-		sourceChannel.transferTo(offset, (fileSize - offset), targetChannel);
-		sourceChannel.truncate(offset);
-		r.seek(offset);
+		sourceChannel.transferTo(insertOffset, (fileSize - insertOffset), targetChannel);
+		sourceChannel.truncate(insertOffset);
+		r.seek(insertOffset);
 		r.write(content.getBytes("UTF-8"));
 		long newOffset = r.getFilePointer();
 		targetChannel.position(0L);
-		sourceChannel.transferFrom(targetChannel, newOffset, (fileSize - offset));
+		sourceChannel.transferFrom(targetChannel, newOffset, (fileSize - insertOffset));
 		sourceChannel.close();
 		targetChannel.close();
 		
 		//refresh the word list
-		createWordList();
-		
-		//delete the temp file
+		syncWordList();
+		System.out.println("[Saved] The word <" + word.getWord() + "> has been saved in the wordbook.");
 	}
 	
 	public boolean hasWord(String word){
@@ -66,7 +113,7 @@ public class WordbookManager {
 		return false;
 	}
 	
-	private void createWordList(){
+	private void syncWordList(){
 		try {
 			File file = new File(rootLocation + wordList);
 			if (!file.exists()) {
@@ -93,15 +140,6 @@ public class WordbookManager {
 	
 	
 	public static void main(String args[]) throws Exception{
-		/*
-		 * insert text test
-		 */
 		WordbookManager wb = new WordbookManager();
-		
-		/*
-		 * check if an item exists
-		 */
-//		wb.createWordList();
-		System.out.println(wb.hasWord("loft"));
 	}
 }

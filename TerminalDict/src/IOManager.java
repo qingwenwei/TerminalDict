@@ -29,11 +29,11 @@ public class IOManager {
 	public Word getWordData(String word, boolean web){
 		//word to be returned
 		Word newWord = new Word();
-		newWord.setWord(word);
+		newWord.setWord(word.replace("%20", " "));
 		
 		//construct the URL
 		String callURL = String.format(URL,KEY_FROM,KEY,word);
-		System.out.println(callURL);
+//		System.out.println(callURL);
 		
 		try {
 			URL url = new URL(callURL);
@@ -54,11 +54,10 @@ public class IOManager {
 			//extract the "basic" JsonObject
 			Set<Entry<String,JsonElement>> basicObjectSet = rootObject.get("basic").getAsJsonObject().entrySet();
 			Iterator<Entry<String,JsonElement>> basicObjectItr = basicObjectSet.iterator();
-			
 			while (basicObjectItr.hasNext()){
 				Entry<String,JsonElement> entry = basicObjectItr.next();
 				String keyValue = entry.getKey();
-				
+					
 				if(keyValue.equals("explains")){
 					for(JsonElement element:entry.getValue().getAsJsonArray()){
 						Pair explaination = new Pair();
@@ -66,7 +65,7 @@ public class IOManager {
 						explaination.setValue(element.getAsString().replaceAll("\"", ""));
 						newWord.addExplaination(explaination);
 					}
-					
+						
 				}else{ // phonetics
 					Pair phonetics = new Pair();
 					phonetics.setName(keyValue);
@@ -95,7 +94,9 @@ public class IOManager {
 			
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
-		} catch (IOException e) {
+		}catch(NullPointerException e){
+			
+		}catch (IOException e) {
 			e.printStackTrace();
 		}
 		
@@ -104,13 +105,14 @@ public class IOManager {
 	
 	
 	public static void main(String args[]) throws IOException{
-		Word word = IOManager.getInstance().getWordData("loft", false);
-//		System.out.println(word.toXMLElement());
+		Word word = IOManager.getInstance().getWordData("air china", false);
+		System.out.println(word.toXMLElement());
 		word.print();
 		
-		WordbookManager wb = new WordbookManager();
-		System.out.println(wb.hasWord(word.getWord()));
-		wb.addWord(11, word);
-		System.out.println(wb.hasWord(word.getWord()));
+		
+		
+//		WordbookManager wb = new WordbookManager();
+//		wb.addWord(word);
 	}
+
 }

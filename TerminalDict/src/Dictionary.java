@@ -1,22 +1,74 @@
+import java.io.IOException;
+import java.util.Scanner;
 
 
 public class Dictionary {
 	public static void main(String args[]){
-		System.out.println(args.length);
+		Word word = null;
 		
-		//word without arguments
+		//one argument
 		if(args.length == 1){
-			System.out.println(args[0]);
+			String argu1 = args[0];
+			if(handleCommand(argu1))
+				return; 
 			
-//			HashMap<String,ArrayList<Entry<String,String>>> wordInfo = new IOManager().getURLJsonData(args[0]);
-			
-//			PromptManager.printResult(wordInfo);
+			word = IOManager.getInstance().getWordData(argu1, false);
 		}
 		
-		if(args.length == 2){
-			//nothing here
+		//more than one arguments
+		if(args.length > 1){
+			String lastArg = args[args.length-1];
+			if(lastArg.equalsIgnoreCase("-p")){
+				String query = buildQuery(args, args.length-1);
+				word = IOManager.getInstance().getWordData(query, true);
+			}else{
+				String query = buildQuery(args, args.length);
+				word = IOManager.getInstance().getWordData(query, false);
+			}
 		}
+		
+		word.print();
+		
+		System.out.println("\nDo you want to save this word to wordbook? [Y/N]");
+		Scanner input = new Scanner(System.in);  
+        String choice = input.next();
+        
+        if(choice.equalsIgnoreCase("y")){
+        		try {
+					new WordbookManager().addWord(word);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+        }else{
+        		System.out.println("[Ignored] This word is ignored.");
+        }
 	}
+	
+	
+	public static String buildQuery(String args[], int end){
+		String query = "";
+		for(int i=0; i<end; i++){
+			query+=args[i]+" ";
+		}
+		query = query.substring(0, query.length()-1);
+		query = query.replaceAll(" ", "%20");
+		System.out.println("built:"+query);
+		return query;
+	}
+	
+	
+	
+	public static boolean handleCommand(String cmd){
+		switch (cmd){
+			case "-which": 
+				System.out.println(new WordbookManager().getRootDir());
+				return true;
+		
+		}
+		
+		return false;
+	}
+	
 	
 	
 }
