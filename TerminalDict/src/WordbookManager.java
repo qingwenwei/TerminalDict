@@ -67,7 +67,7 @@ public class WordbookManager {
 			String currentLine;	 
 			BufferedReader br = new BufferedReader(new FileReader(rootLocation + wordList));	
 			while ((currentLine = br.readLine()) != null) {	
-				if(currentLine.contains(word)){
+				if(currentLine.equalsIgnoreCase(word)){
 					return true;
 				}
 			}
